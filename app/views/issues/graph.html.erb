@@ -1,0 +1,7 @@
+<div id="relations-graph-container"><%= @issue %></div>
+
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'graph', :plugin => "redmine_relations_graph" %>
+<% end %>
+<%= javascript_include_tag 'graph', :plugin => "redmine_relations_graph" %>
+

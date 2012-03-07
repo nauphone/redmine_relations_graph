@@ -1,0 +1,9 @@
+<script type="text/javascript">
+  function open_issues_graph() {
+    url = "<%= url_for :controller => 'issues', :action => 'graph', :project_id => @project %>" + '?' + $('query_form').serialize();
+    new_window = window.open(url,'relationgraphpopup','height=500,width=400,resizable=yes,scrollbars=yes,toolbar=no,status=no');
+    if (window.focus) { new_window.focus() }
+  }
+  var link = "<%= escape_javascript link_to_function l(:build_graph), "open_issues_graph()", :class => 'icon icon-summary' %>";
+  $$('#query_form .buttons.hide-when-print').first().insert({top: link});
+</script>

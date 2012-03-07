@@ -1,0 +1,6 @@
+#relations-graph-container {
+  text-align: center;
+}
+#issue-relations-graph .node {
+  cursor: pointer;
+}
