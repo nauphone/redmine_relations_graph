@@ -3,24 +3,30 @@ require 'graphviz'
 module Plugin
   module RelationsGraph
     class RelationsGraph
-      attr_accessor :nodes, :edges, :issues
+      attr_accessor :nodes, :edges, :issues, :issues_without_relations
       def initialize issues
         @issues = Array.wrap(issues)
         @nodes = {}
         @edges = {}
+        @issues_without_relations = []
+        @builded = false
       end
 
       def get_graph format = :svg
-        @g = GraphViz.new( :G, :type => :digraph )
-        @g[:id] = 'issue-relations-graph'
+        unless @builded
+          @g = GraphViz.new( :G, :type => :digraph )
+          @g[:id] = 'issue-relations-graph'
 
-        path = []
-        @issues.each { |issue|
-          issue.relations.each { |relation|
-            add_edge relation unless path.include? relation.id
-            path << relation.id
+          path = []
+          @issues.each { |issue|
+            @issues_without_relations << issue if issue.relations.count == 0
+            issue.relations.each { |relation|
+              add_edge relation unless path.include? relation.id
+              path << relation.id
+            }
           }
-        }
+          @builded = true
+        end
         @g.output format => String
       end
 
@@ -31,10 +37,15 @@ module Plugin
           node = @nodes[issue.id]
         else
           node = @g.add_nodes "##{issue.id.to_s}"
-          node[:style] = 'filled'
+          if @issues.include? issue
+            node[:style] = 'filled,bold'
+          else
+            node[:style] = 'filled'
+          end
           node[:id] = "issue-node-#{issue.id.to_s}"
 #          node[:color] = ( issue.closed? ? '#00AAFF' : '#FFAA00' )
           node[:fillcolor] = '#EEEEEE'
+          node[:URL] = '#'
           @nodes[issue.id] = node
         end
         node

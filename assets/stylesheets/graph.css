@@ -4,3 +4,24 @@
 #issue-relations-graph .node {
   cursor: pointer;
 }
+
+#issues-without-relation {
+  width: 200px;
+  float: left;
+}
+#issues-without-relation h5 {
+  margin: 0 0 5px 0;
+}
+#issues-without-relation ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+  width: 200px;
+  overflow: hidden;
+}
+#issues-without-relation ul li a {
+  font: normal 10px arial;
+  color: #2A5685;
+}
+
