@@ -53,7 +53,7 @@ module Plugin
 
       def add_edge relation
         if @edges.key? [ relation.issue_from.id, relation.issue_to.id ]
-          edge = @edges[ relation.issue_from.id, relation.issue_to.id ]
+          edge = @edges[ [relation.issue_from.id, relation.issue_to.id] ]
         else
           edge = @g.add_edges add_node(relation.issue_from), add_node(relation.issue_to)
           edge[:id] = "edge-#{relation.issue_from.id}-#{relation.issue_to.id}"

@@ -1,3 +1,4 @@
+<div style="white-space: nowrap">
 <div id="issues-without-relation">
   <h5>Issues without relations</h5>
   <ul>
@@ -7,7 +8,7 @@
   </ul>
 </div>
 <div id="relations-graph-container"><img src="data:image/png;base64,<%= Base64.encode64(@image) %>" usemap="#G"/><%= @map %></div>
-
+</div>
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag 'graph', :plugin => "redmine_relations_graph" %>
 <% end %>
