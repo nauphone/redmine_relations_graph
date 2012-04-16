@@ -19,7 +19,7 @@ module Plugin
 
           path = []
           @issues.each { |issue|
-            @issues_without_relations << issue if issue.relations.count == 0
+            @issues_without_relations << issue if issue.relations.length == 0
             issue.relations.each { |relation|
               add_edge relation unless path.include? relation.id
               path << relation.id
