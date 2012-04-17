@@ -16,6 +16,7 @@ module Plugin
         unless @builded
           @g = GraphViz.new( :G, :type => :digraph )
           @g[:id] = 'issue-relations-graph'
+          @g[:size] = 10
 
           path = []
           @issues.each { |issue|
@@ -27,7 +28,14 @@ module Plugin
           }
           @builded = true
         end
-        @g.output format => String
+        output = @g.output format => String
+        if format == :cmapx
+          output.gsub! /title="#(\d+)"/ do
+            title = Issue.find($1.to_i).subject.gsub(/"/, "&quot;")
+            "title=\"#{title}\""
+          end
+        end
+        output
       end
 
       protected
