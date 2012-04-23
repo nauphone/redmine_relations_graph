@@ -25,3 +25,6 @@
   color: #2A5685;
 }
 
+svg {
+  float: left;
+}

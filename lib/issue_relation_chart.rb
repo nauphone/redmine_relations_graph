@@ -2,6 +2,83 @@ require 'graphviz'
 
 module Plugin
   module RelationsGraph
+
+    class RelationGraph2
+      attr_accessor :clusters, :svgs
+      def initialize issues
+        @issues = issues
+
+        @nodes = {}
+        @edges = {}
+        @clusters = []
+        @in_clusters = []
+
+        @issues.each { |issue|
+          unless @in_clusters.include? issue
+            cluster = get_related_issues issue
+            @in_clusters += cluster
+            @clusters.push cluster
+          end
+        }
+        @svgs = []
+        @clusters.sort! { |a, b|
+          b.count <=> a.count
+        }
+        @clusters.each { |cluster|
+          g = Plugin::RelationsGraph::RelationsGraph.new(cluster)
+          @svgs.push g.get_graph
+        }
+
+        # @issues.each { |issue|
+        #   unless @nodes.key? issue.id
+        #     cluster = GraphViz.new( :G, :type => :digraph )
+        #     build_graph issue, cluster
+        #     @clusters.push cluster
+        #   end
+        # }
+        self
+      end
+
+      def get_related_issues issue, path = []
+        unless path.include? issue
+          path.push issue
+          issue.relations.each { |relation|
+            child_node = relation.issue_from == issue ? relation.issue_to : relation.issue_from
+            get_related_issues child_node, path
+          }
+        end
+        path
+      end
+
+      def get_graph
+        result = []
+        @clusters.each { |cluster|
+          result.push cluster.output(:svg => String)
+        }
+        result
+      end
+
+      def build_graph root_issue, cluster
+        unless @nodes.key? root_issue.id
+          @nodes[root_issue.id] = root_issue
+          root_issue.relations.each { |relation|
+            add_edge relation, cluster
+            build_graph relation.issue_from, cluster
+            build_graph relation.issue_to, cluster
+          }
+        end
+      end
+
+      def add_edge relation, cluster
+        unless @nodes.key? relation.issue_from.id
+          cluster.add_nodes "##{relation.issue_from.id.to_s}"
+        end
+        unless @nodes.key? relation.issue_to.id
+          cluster.add_nodes "##{relation.issue_to.id.to_s}"
+        end
+      end
+    end
+
     class RelationsGraph
       attr_accessor :nodes, :edges, :issues, :issues_without_relations
       def initialize issues
@@ -19,6 +96,9 @@ module Plugin
           @g[:size] = 10
 
           path = []
+          @issues.each { |issue|
+            add_node issue
+          }
           @issues.each { |issue|
             @issues_without_relations << issue if issue.relations.length == 0
             issue.relations.each { |relation|
