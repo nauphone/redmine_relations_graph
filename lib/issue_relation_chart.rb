@@ -3,14 +3,15 @@ require 'graphviz'
 module Plugin
   module RelationsGraph
 
-    class RelationGraph2
-      attr_accessor :clusters, :svgs
+    class RelationGraph
+      attr_accessor :clusters
       def initialize issues
         @issues = issues
 
         @nodes = {}
         @edges = {}
         @clusters = []
+        @result = []
         @in_clusters = []
 
         @issues.each { |issue|
@@ -24,18 +25,16 @@ module Plugin
         @clusters.sort! { |a, b|
           b.count <=> a.count
         }
+        number = 0
         @clusters.each { |cluster|
-          g = Plugin::RelationsGraph::RelationsGraph.new(cluster)
-          @svgs.push g.get_graph
+          g = Plugin::RelationsGraph::RelationsGraphBuilder.new(cluster, issues)
+          @result.push({
+            :png => g.get_graph(number, :png),
+            :map => g.get_graph(number, :cmapx),
+            :number => number
+            })
+          number += 1
         }
-
-        # @issues.each { |issue|
-        #   unless @nodes.key? issue.id
-        #     cluster = GraphViz.new( :G, :type => :digraph )
-        #     build_graph issue, cluster
-        #     @clusters.push cluster
-        #   end
-        # }
         self
       end
 
@@ -46,53 +45,36 @@ module Plugin
             child_node = relation.issue_from == issue ? relation.issue_to : relation.issue_from
             get_related_issues child_node, path
           }
+          issue.children.each { |child|
+            get_related_issues child, path
+          }
+          unless issue.parent_issue_id.nil?
+            get_related_issues Issue.find(issue.parent_issue_id), path
+          end
         end
         path
       end
 
-      def get_graph
-        result = []
-        @clusters.each { |cluster|
-          result.push cluster.output(:svg => String)
-        }
-        result
-      end
-
-      def build_graph root_issue, cluster
-        unless @nodes.key? root_issue.id
-          @nodes[root_issue.id] = root_issue
-          root_issue.relations.each { |relation|
-            add_edge relation, cluster
-            build_graph relation.issue_from, cluster
-            build_graph relation.issue_to, cluster
-          }
-        end
-      end
-
-      def add_edge relation, cluster
-        unless @nodes.key? relation.issue_from.id
-          cluster.add_nodes "##{relation.issue_from.id.to_s}"
-        end
-        unless @nodes.key? relation.issue_to.id
-          cluster.add_nodes "##{relation.issue_to.id.to_s}"
-        end
+      def get_graphs
+        @result
       end
     end
 
-    class RelationsGraph
+    class RelationsGraphBuilder
       attr_accessor :nodes, :edges, :issues, :issues_without_relations
-      def initialize issues
+      def initialize issues, hl_issues
         @issues = Array.wrap(issues)
+        @hl_issues = Array.wrap(hl_issues)
         @nodes = {}
         @edges = {}
         @issues_without_relations = []
         @builded = false
       end
 
-      def get_graph format = :svg
+      def get_graph number = 0, format = :svg
         unless @builded
-          @g = GraphViz.new( :G, :type => :digraph )
-          @g[:id] = 'issue-relations-graph'
+          @g = GraphViz.new("issuerelationsgraph#{number}", :type => :digraph )
+          @g[:id] = "issuerelationsgraph#{number}"
           @g[:size] = 10
 
           path = []
@@ -100,11 +82,12 @@ module Plugin
             add_node issue
           }
           @issues.each { |issue|
-            @issues_without_relations << issue if issue.relations.length == 0
+            #@issues_without_relations << issue if issue.relations.length == 0
             issue.relations.each { |relation|
               add_edge relation unless path.include? relation.id
               path << relation.id
             }
+            add_edge_subtask issue
           }
           @builded = true
         end
@@ -125,18 +108,31 @@ module Plugin
           node = @nodes[issue.id]
         else
           node = @g.add_nodes "##{issue.id.to_s}"
-          if @issues.include? issue
+          if @hl_issues.include? issue
             node[:style] = 'filled,bold'
           else
             node[:style] = 'filled'
           end
           node[:id] = "issue-node-#{issue.id.to_s}"
-#          node[:color] = ( issue.closed? ? '#00AAFF' : '#FFAA00' )
           node[:fillcolor] = '#EEEEEE'
           node[:URL] = '#'
           @nodes[issue.id] = node
         end
         node
+      end
+
+      def add_edge_subtask issue_to
+        return if issue_to.parent_issue_id.nil?
+        issue_from = Issue.find(issue_to.parent_issue_id)
+        if @edges.key? [ issue_from.id, issue_to.id ]
+          edge = @edges[ [issue_from.id, issue_to.id] ]
+        else
+          edge = @g.add_edges add_node(issue_from), add_node(issue_to)
+          edge[:id] = "edge-#{issue_from.id}-#{issue_to.id}"
+          edge[:color] = "#00FF00"
+          @edges[ [issue_from.id, issue_to.id] ] = edge
+        end
+        edge
       end
 
       def add_edge relation

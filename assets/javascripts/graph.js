@@ -1,6 +1,7 @@
-$$('#issue-relations-graph .node, map#G area').each(function(node) {
+$$('#issue-relations-graph .node, map area').each(function(node) {
   Event.observe(node, 'click', function(event) {
-    var event_id = /issue-node-(\d+)/.exec(this.id)[1]
+    console.log('Click');
+    var event_id = /issue-node-(\d+)/.exec(this.id)[1];
     if (window.name == 'relationgraphpopup') {
       window.opener.document.location = '/issues/' + event_id;
       self.close();
@@ -10,12 +11,12 @@ $$('#issue-relations-graph .node, map#G area').each(function(node) {
   });
 });
 
-$$('#issues-without-relation ul li a').each(function(link) {
-  Event.observe(link, 'click', function(event) {
-    if (window.name == 'relationgraphpopup') {
-      window.opener.document.location = this.attributes['href'].value
-      self.close();
-    }
-  });
-});
+// $$('#issues-without-relation ul li a').each(function(link) {
+//   Event.observe(link, 'click', function(event) {
+//     if (window.name == 'relationgraphpopup') {
+//       window.opener.document.location = this.attributes['href'].value
+//       self.close();
+//     }
+//   });
+// });
 

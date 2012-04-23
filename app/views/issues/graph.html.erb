@@ -1,6 +1,9 @@
-<div style="">
-<% @svgs.each do |s| %>
-  <%= s %>
+<div>
+<% @graphs.each do |graph| %>
+  <div style="float: left">
+    <img src="data:image/png;base64,<%= Base64.encode64(graph[:png]) %>" usemap="#issuerelationsgraph<%= graph[:number] %>"/>
+    <%= graph[:map] %>
+  </div>
 <% end %>
 </div>
 <% content_for :header_tags do %>

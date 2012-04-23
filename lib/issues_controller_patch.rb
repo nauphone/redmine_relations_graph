@@ -9,11 +9,8 @@
 
         def graph
           retrieve_query
-          g = Plugin::RelationsGraph::RelationGraph2.new(@query.issues)
-          @svgs = g.svgs
-          #@image = g.get_graph :png
-          #@map = g.get_graph :cmapx
-          #@issues = g.issues_without_relations
+          g = Plugin::RelationsGraph::RelationGraph.new(@query.issues)
+          @graphs = g.get_graphs
           render :layout => 'popup'
         end
       end
