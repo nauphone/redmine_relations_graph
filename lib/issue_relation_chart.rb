@@ -115,7 +115,7 @@ module Plugin
           end
           node[:id] = "issue-node-#{issue.id.to_s}"
           node[:fillcolor] = '#EEEEEE'
-          node[:URL] = '#'
+          node[:URL] = "##{issue.id}"
           @nodes[issue.id] = node
         end
         node
