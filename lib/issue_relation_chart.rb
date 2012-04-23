@@ -23,7 +23,7 @@ module Plugin
         }
         @svgs = []
         @clusters.sort! { |a, b|
-          b.count <=> a.count
+          b.length <=> a.length
         }
         number = 0
         @clusters.each { |cluster|
