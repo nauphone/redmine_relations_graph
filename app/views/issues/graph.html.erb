@@ -6,8 +6,17 @@
   </div>
 <% end %>
 </div>
-<% content_for :header_tags do %>
-  <%= stylesheet_link_tag 'graph', :plugin => "redmine_relations_graph" %>
-<% end %>
-<%= javascript_include_tag 'graph', :plugin => "redmine_relations_graph" %>
 
+<script type="text/javascript">
+$$('#issue-relations-graph .node, map area').each(function(node) {
+  Event.observe(node, 'click', function(event) {
+    var event_id = /issue-node-(\d+)/.exec(this.id)[1];
+    if (window.name == 'relationgraphpopup') {
+      window.opener.document.location = '/issues/' + event_id;
+      self.close();
+    } else {
+      document.location = '/issues/' + event_id;
+    }
+  });
+});
+</script>
