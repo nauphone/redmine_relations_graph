@@ -12,10 +12,10 @@ $$('map area').each(function(node) {
   Event.observe(node, 'click', function(event) {
     var id = /#(\d+)/.exec(this.attributes['href'].value)[1];
     if (window.name == 'relationgraphpopup') {
-      window.opener.document.location = '/issues/' + id;
+      window.opener.document.location = '<%= issues_path %>/' + id;
       self.close();
     } else {
-      document.location = '/issues/' + id;
+      document.location = '<%= issues_path %>/' + id;
     }
   });
 });
