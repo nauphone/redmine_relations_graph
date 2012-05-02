@@ -1,3 +1,45 @@
+<style type="text/css">
+#graph-legend {
+  position: fixed;
+  bottom: 0;
+  background: #fff;
+  border: 1px solid #000;
+}
+#graph-legend.on-left {
+  left: 0;
+}
+#graph-legend.on-right {
+  right: 0;
+}
+
+#graph-legend ul {
+  list-style: none;
+  padding: 0;
+}
+#graph-legend ul li {
+  vertical-align: middle;
+  padding: 5px;
+  clear: both;
+}
+
+#graph-legend ul li span {
+  vertical-align: middle;
+  font: normal 12px arial;
+}
+
+#graph-legend ul li img {
+  vertical-align: middle;
+}
+</style>
+<div id="graph-legend" class="on-right">
+  <ul style="list-style: none">
+    <li><img src="/plugin_assets/redmine_relations_graph/images/red_arrow.png" /><span> — Open Blocker</span></li>
+    <li><img src="/plugin_assets/redmine_relations_graph/images/blue_arrow.png" /><span> — Closed Blocker</span></li>
+    <li><img src="/plugin_assets/redmine_relations_graph/images/green_arrow.png" /><span> — SubTask</span></li>
+    <li><img src="/plugin_assets/redmine_relations_graph/images/bold_issue.png" /><span> — Issue from request</span></li>
+    <li><img src="/plugin_assets/redmine_relations_graph/images/thin_issue.png" /><span> — Related issue</span></li>
+  </ul>
+</div>
 <div>
 <% @graphs.each do |graph| %>
   <div style="float: left">
@@ -19,4 +61,15 @@ $$('map area').each(function(node) {
     }
   });
 });
+$('graph-legend').observe('mousemove', function(event) {
+  var element = Event.element(event);
+  if (element.hasClassName('on-left')) {
+    element.removeClassName('on-left');
+    element.addClassName('on-right');
+  } else {
+    element.removeClassName('on-right');
+    element.addClassName('on-left');
+  }
+});
+
 </script>
