@@ -1,7 +1,13 @@
 <script type="text/javascript">
   function open_issues_graph() {
-    var url = "<%= url_for :controller => 'issues', :action => 'graph', :project_id => @project %>" + '?' + $('query_form').serialize();
-    var new_window = window.open(url,'relationgraphpopup','height=500,width=600,resizable=yes,scrollbars=yes,toolbar=no,status=no');
+    var url = "<%= url_for :controller => 'issues', :action => 'graph', :project_id => @project %>"// + '?' + $('query_form').serialize();
+    var old_url = $('query_form').getAttribute('action')
+    var new_window = window.open('','relationgraphpopup','height=500,width=600,resizable=yes,scrollbars=yes,toolbar=no,status=no');
+    $('query_form').setAttribute('action', url)
+    $('query_form').setAttribute('target', 'relationgraphpopup')
+    $('query_form').submit()
+    $('query_form').setAttribute('action', old_url)
+    $('query_form').removeAttribute('target')
     if (window.focus) { new_window.focus() }
   }
   var link = "<%= escape_javascript link_to_function l(:build_graph), "open_issues_graph()", :class => 'icon icon-summary' %>";
