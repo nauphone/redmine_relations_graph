@@ -8,7 +8,12 @@
         end
 
         def graph
+          params.delete :group_by
+          params.delete :available_columns
+
           retrieve_query
+
+          debugger
           g = Plugin::RelationsGraph::RelationGraph.new(@query.issues)
           @graphs = g.get_graphs
           render :layout => 'popup'
