@@ -1,4 +1,5 @@
-ActionController::Routing::Routes.draw do |map|
-  map.issue_relations_graph '/projects/:project_id/issues/graph', :controller => 'issues', :action => 'graph'
+RedmineApp::Application.routes.draw do
+    match '/projects/:project_id/issues/graph', :controller => 'issues', :action => 'graph'
+    match '/projects/issues/graph', :controller => 'issues', :action => 'graph', :project_id => nil
 end
 

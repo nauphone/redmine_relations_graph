@@ -44,26 +44,24 @@
 <% @graphs.each do |graph| %>
   <div style="float: left">
     <img src="data:image/png;base64,<%= Base64.encode64(graph[:png]) %>" usemap="#issuerelationsgraph<%= graph[:number] %>"/>
-    <%= graph[:map] %>
+    <%= graph[:map].html_safe %>
   </div>
 <% end %>
 </div>
 
 <script type="text/javascript">
-$$('map area').each(function(node) {
-  Event.observe(node, 'click', function(event) {
+$('map area').on('click', function(event) {
     var id = /#(\d+)/.exec(this.attributes['href'].value)[1];
     window.open('<%= issues_path %>/' +  id, '_blank')
   });
-});
-$('graph-legend').observe('mousemove', function(event) {
-  var element = Event.element(event);
-  if (element.hasClassName('on-left')) {
-    element.removeClassName('on-left');
-    element.addClassName('on-right');
+$('#graph-legend').on('mousemove', function(event) {
+  var element = $(event.target);
+  if (element.hasClass('on-left')) {
+    element.removeClass('on-left');
+    element.addClass('on-right');
   } else {
-    element.removeClassName('on-right');
-    element.addClassName('on-left');
+    element.removeClass('on-right');
+    element.addClass('on-left');
   }
 });
 
