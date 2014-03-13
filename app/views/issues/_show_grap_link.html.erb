@@ -1,0 +1,9 @@
+<script type="text/javascript">
+  function open_issue_graph() {
+    var url = "<%= url_for :controller => 'issues', :action => 'graph_issue' %>"
+    var new_window = window.open(url,'relationgraphpopup','height=500,width=600,resizable=yes,scrollbars=yes,toolbar=no,status=no');
+    if (window.focus) { new_window.focus() }
+    return false;
+  }
+</script>
+| <%= link_to_function l(:build_graph), "open_issue_graph(); ", :class => 'icon icon-summary' %>

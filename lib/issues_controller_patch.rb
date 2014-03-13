@@ -3,7 +3,7 @@
       module IssuesControllerPatch
         def self.included base
           base.class_eval do
-            skip_before_filter :authorize, :only => [:graph]
+            skip_before_filter :authorize, :only => [:graph, :graph_issue]
           end
         end
 
@@ -18,6 +18,15 @@
           g = Plugin::RelationsGraph::RelationGraph.new(@query.issues)
           @graphs = g.get_graphs
           render :layout => 'popup'
+        end
+
+        def graph_issue
+          issue=[Issue.find(params[:id])]
+          if issue.any?
+            g = Plugin::RelationsGraph::RelationGraph.new(issue)
+            @graphs = g.get_graphs
+          end
+          render "graph", :layout => 'popup'
         end
       end
     end
