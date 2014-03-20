@@ -113,8 +113,14 @@ module Plugin
           else
             node[:style] = 'filled'
           end
+          if issue.closed?
+            node[:fillcolor] = '#333333'
+            node[:color] = '#333333'
+            node[:fontcolor] = '#FFFFFF'
+          else
+            node[:fillcolor] = '#EEEEEE'
+          end
           node[:id] = "issue-node-#{issue.id.to_s}"
-          node[:fillcolor] = '#EEEEEE'
           node[:URL] = "##{issue.id}"
           @nodes[issue.id] = node
         end
