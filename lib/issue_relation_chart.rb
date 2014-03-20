@@ -145,10 +145,16 @@ module Plugin
         if @edges.key? [ relation.issue_from.id, relation.issue_to.id ]
           edge = @edges[ [relation.issue_from.id, relation.issue_to.id] ]
         else
-          edge = @g.add_edges add_node(relation.issue_from), add_node(relation.issue_to)
+          if relation.relation_type == 'blocks'
+            edge = @g.add_edges add_node(relation.issue_to), add_node(relation.issue_from)
+          else
+            edge = @g.add_edges add_node(relation.issue_from), add_node(relation.issue_to)
+          end
+          if relation.relation_type == 'relates'
+            edge[:dir]='both'
+          end
           edge[:id] = "edge-#{relation.issue_from.id}-#{relation.issue_to.id}"
           edge[:color] = relation.relation_type == 'blocks' ? ( relation.issue_from.closed? ? '#00AAFF' : '#FF0000') : '#000000'
-
           @edges[ [relation.issue_from.id, relation.issue_to.id] ] = edge
         end
         edge
