@@ -38,22 +38,27 @@ module Plugin
         self
       end
 
-      def get_related_issues issue, path = []
-        unless path.include? issue
-          path.push issue
-          issue.relations.each { |relation|
-            child_node = relation.issue_from == issue ? relation.issue_to : relation.issue_from
-            get_related_issues child_node, path
-          }
-          issue.children.each { |child|
-            get_related_issues child, path
-          }
-          unless issue.parent_issue_id.nil?
-            get_related_issues Issue.find(issue.parent_issue_id), path
+      def get_related_issues issue, path = [], level = 0
+        unless level >= 2
+          unless path.include? issue
+            level += 1
+            path.push issue
+            issue.relations.each do |relation|
+              child_node = relation.issue_from == issue ? relation.issue_to : relation.issue_from
+              get_related_issues(child_node, path, level)
+            end
+            issue.children.each do |child|
+              get_related_issues(child, path, level)
+            end
+
+            unless issue.parent_issue_id.nil?
+              get_related_issues(Issue.find(issue.parent_issue_id), path, level)
+            end
           end
         end
         path
       end
+
 
       def get_graphs
         @result
