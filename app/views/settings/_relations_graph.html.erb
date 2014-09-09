@@ -1,0 +1,5 @@
+<% defaults = Redmine::Plugin::registered_plugins[:redmine_relations_graph].settings[:default] %>
+<p>
+  <label>Maximum depth:</label>
+  <%= text_field_tag("settings[max_depth]", @settings["max_depth"] || defaults["max_depth"]) %>
+</p>

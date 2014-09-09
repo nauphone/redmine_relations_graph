@@ -10,12 +10,14 @@
         def graph
           params.delete :group_by
           params.delete :available_columns
-
           @project = Project.find(params[:project_id])
-
           retrieve_query
-
-          g = Plugin::RelationsGraph::RelationGraph.new(@query.issues)
+          if params[:max_depth].to_i > 0
+            max_depth = params[:max_depth].to_i
+          else
+            max_depth = Setting.plugin_redmine_relations_graph["max_depth"].to_i
+          end
+          g = Plugin::RelationsGraph::RelationGraph.new(@query.issues, max_depth)
           @graphs = g.get_graphs
           render :layout => 'popup'
         end
@@ -23,7 +25,12 @@
         def graph_issue
           issue=[Issue.find(params[:id])]
           if issue.any?
-            g = Plugin::RelationsGraph::RelationGraph.new(issue)
+            if params[:max_depth].to_i > 0
+              max_depth = params[:max_depth].to_i
+            else
+              max_depth = Setting.plugin_redmine_relations_graph["max_depth"].to_i
+            end
+            g = Plugin::RelationsGraph::RelationGraph.new(issue, max_depth)
             @graphs = g.get_graphs
           end
           render "graph", :layout => 'popup'

@@ -14,4 +14,6 @@ Redmine::Plugin.register :redmine_relations_graph do
   author '-'
   description 'Displays issues relations graph'
   version '0.0.1'
+  settings :default => {"max_depth" => "2"},
+           :partial => "settings/relations_graph"
 end

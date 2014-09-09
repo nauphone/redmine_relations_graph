@@ -5,7 +5,8 @@ module Plugin
 
     class RelationGraph
       attr_accessor :clusters
-      def initialize issues
+      def initialize issues, max_depth
+        @max_depth = max_depth
         @issues = issues
 
         @nodes = {}
@@ -16,7 +17,7 @@ module Plugin
 
         @issues.each { |issue|
           unless @in_clusters.include? issue
-            cluster = get_related_issues issue
+            cluster = get_related_issues(issue)
             @in_clusters += cluster
             @clusters.push cluster
           end
@@ -38,8 +39,8 @@ module Plugin
         self
       end
 
-      def get_related_issues issue, path = [], level = 0
-        unless level >= 2
+      def get_related_issues(issue, path=[], level=0)
+        unless level >= @max_depth
           unless path.include? issue
             level += 1
             path.push issue
@@ -50,15 +51,13 @@ module Plugin
             issue.children.each do |child|
               get_related_issues(child, path, level)
             end
-
-            unless issue.parent_issue_id.nil?
-              get_related_issues(Issue.find(issue.parent_issue_id), path, level)
+            unless issue.parent.nil?
+              get_related_issues(issue.parent, path, level)
             end
           end
         end
         path
       end
-
 
       def get_graphs
         @result
